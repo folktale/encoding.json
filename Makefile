@@ -24,16 +24,17 @@ TEST_TGT = ${TEST_SRC:$(TEST_DIR)/%.sjs=$(TEST_BLD)/%.js}
 dist:
 	mkdir -p $@
 
-dist/$(PACKAGE).umd.js: $(LIB_DIR)/index.js dist
+dist/$$PACKAGE.umd.js: $(LIB_DIR)/index.js dist
 	$(browserify) $< --standalone $(EXPORTS) > $@
 
-dist/$(PACKAGE).umd.min.js: dist/$(PACKAGE).umd.js
+dist/$$PACKAGE.umd.min.js: dist/$(PACKAGE).umd.js
 	$(uglify) --mangle - < $< > $@
 
 $(LIB_DIR)/%.js: $(SRC_DIR)/%.sjs
 	mkdir -p $(dir $@)
 	$(sjs) --readable-names \
 	       --sourcemap      \
+	       --module es6-macros/macros/destructure \
 	       --output $@      \
 	       $<
 
@@ -42,6 +43,8 @@ $(TEST_BLD)/%.js: $(TEST_DIR)/%.sjs
 	$(sjs) --readable-names        \
 	       --module hifive/macros  \
 	       --module alright/macros \
+	       --module es6-macros/macros/destructure \
+	       --module lambda-chop/macros \
 	       --output $@             \
 	       $<
 
@@ -64,7 +67,7 @@ clean:
 	rm -rf dist build $(LIB_DIR)
 
 test: all $(TEST_TGT)
-	node test/tap
+	node test/run
 
 package: documentation bundle minify
 	mkdir -p dist/$(PACKAGE)-$(VERSION)

@@ -1,6 +1,6 @@
 {
   "name": "encoding.json",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Lossless serialisation and parsing of JSON structures for complex objects",
   "main": "lib/index.js",
   "scripts": {
@@ -19,7 +19,9 @@
   "bugs": {
     "url": "https://github.com/folktale/encoding.json/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "data.either": "~1.2.0"
+  },
   "devDependencies": {
     "browserify": "^6.1.0",
     "ink-docstrap": "git://github.com/robotlolita/docstrap",
@@ -28,6 +30,10 @@
     "hifive": "^0.4.0",
     "uglify-js": "^2.4.15",
     "alright": "^1.1.0",
-    "sweet.js": "^0.7.1"
+    "sweet.js": "0.7.1",
+    "lambda-chop": "~0.1.5",
+    "es6-macros": "0.0.7",
+    "claire": "~0.4.1",
+    "deep-equal": "~0.2.1"
   }
 }

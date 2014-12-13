@@ -18,44 +18,4 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-/**
- * Lossless serialisation and parsing of JSON structures for complex objects
- *
- * @module lib/index
- */
-
-var { Left, Right } = require('data.either');
-
-function raise(e) {
-  throw e
-}
-
-function id(a) {
-  return a
-}
-
-function foldType(mapping, data) {
-  var type = data['#type'];
-  var branch = mapping[type];
-
-  return !type?    Left(new Error("The provided data structure isn't typed."))
-  :      !branch?  Left(new Error("No mapping provided by type: " + type))
-  :      /* _ */   Right(branch(data))
-}
-
-function reifyAs(spec, data) {
-  return spec.fromJSON(data).fold(raise, id)
-}
-
-function parseAs(spec, text) {
-  return reifyAs(spec, JSON.parse(text))
-}
-
-
-module.exports = {
-  serialise: JSON.stringify,
-  foldType: foldType,
-  reifyAs: reifyAs,
-  parseAs: parseAs
-}
+module.exports = [require('./core')];

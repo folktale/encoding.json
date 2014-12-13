@@ -147,5 +147,5 @@ Released under the [MIT licence](https://github.com/folktale/encoding.json/blob/
 [es5-shim]: https://github.com/kriskowal/es5-shim
 [docs]: http://folktale.github.io/encoding.json
 <!-- [release: https://github.com/folktale/encoding.json/releases/download/v$VERSION/encoding.json-$VERSION.tar.gz] -->
-[release]: https://github.com/folktale/encoding.json/releases/download/v0.0.0/encoding.json-0.0.0.tar.gz
+[release]: https://github.com/folktale/encoding.json/releases/download/v0.1.0/encoding.json-0.1.0.tar.gz
 <!-- [/release] -->
