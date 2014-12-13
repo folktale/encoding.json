@@ -26,7 +26,7 @@ var Nothing = {
   // provided data can be parsed, otherwise an Either.Left with the
   // reasons it can't be parsed.
   fromJSON: function(data) {
-    return Enc.mapType(data, {
+    return Enc.foldType(data, {
       'Nothing': function(){ return Nothing }
     })
   },
@@ -39,7 +39,7 @@ var Just = function(value) {
       return { '#type': 'Just', value: value }
     },
     fromJSON: function(data) {
-      return Enc.mapType(data, {
+      return Enc.foldType(data, {
         'Just': function(data){ return Just(data.value) }
       })
     },
