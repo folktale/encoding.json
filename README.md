@@ -16,6 +16,7 @@ Lossless serialisation and parsing of JSON structures for complex objects
 ```js
 var Enc = require('encoding.json');
 
+// Simple structures
 var Nothing = {
   // A toJSON method should return the representation of the object
   toJSON: function() {
@@ -57,6 +58,20 @@ Enc.parseSAs(Just, b)
 // => Just(2)
 Enc.parseAs(Just, a)
 // => Either.Left("Unknow type: Nothing")
+
+
+// Complex interfaces
+var IPerson = Enc.spec({
+  name: Enc.Any,
+  age: Enc.Any,
+  avatar: Maybe
+});
+
+var personA = { name: "Alice", age: 12, avatar: Maybe.Just("/alice.png") };
+var personB = { name: "Rabbit", age: 100, avatar: Maybe.Nothing };
+
+Enc.reifyAs(IPerson, Enc.serialise(personA)) // => personA
+Enc.reifyAs(IPerson, Enc.serialise(personB)) // => personB
 ```
 
 

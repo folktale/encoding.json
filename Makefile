@@ -35,6 +35,7 @@ $(LIB_DIR)/%.js: $(SRC_DIR)/%.sjs
 	$(sjs) --readable-names \
 	       --sourcemap      \
 	       --module es6-macros/macros/destructure \
+	       --module lambda-chop/macros \
 	       --output $@      \
 	       $<
 

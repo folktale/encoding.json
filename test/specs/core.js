@@ -43,9 +43,22 @@ var TMaybe = function (a) {
     return label('Maybe', transform(maybe, a));
 };
 var U = choice(Anys, TMaybe);
+var __ref$2 = require('data.either');
+var Left = __ref$2.Left;
+var Right = __ref$2.Right;
 function choose(xs) {
     return xs[Math.floor(Math.random() * xs.length)];
 }
+var PNumber = {
+        fromJSON: function (data) {
+            return typeof data !== 'number' ? Left(new TypeError('Not a number: ' + data)) : Right(data);
+        }
+    };
+var PString = {
+        fromJSON: function (data) {
+            return typeof data !== 'string' ? Left(new TypeError('Not a string: ' + data)) : Right(data);
+        }
+    };
 module.exports = function (hifive) {
     var _scope = {
             hifive: hifive,
@@ -153,6 +166,121 @@ module.exports = function (hifive) {
             }));
             _scope$2.tests.push(_scope$2.hifive.Test.Suite.create({
                 name: 'Parsing',
+                tests: _scope$3.tests,
+                beforeAll: _scope$2.hifive.Hook(_scope$3.beforeAll),
+                beforeEach: _scope$2.hifive.Hook(_scope$3.beforeEach),
+                afterAll: _scope$2.hifive.Hook(_scope$3.afterAll),
+                afterEach: _scope$2.hifive.Hook(_scope$3.afterEach)
+            }));
+        }());
+        (function () {
+            var _scope$3 = {
+                    hifive: _scope$2.hifive,
+                    tests: [],
+                    beforeAll: [],
+                    afterAll: [],
+                    beforeEach: [],
+                    afterEach: []
+                };
+            _scope$3.tests.push(_scope$3.hifive.Test.Case.create({
+                name: 'Should apply the parsers to the right keys',
+                timeout: new _scope$3.hifive._Maybe.Nothing(),
+                slow: new _scope$3.hifive._Maybe.Nothing(),
+                enabled: new _scope$3.hifive._Maybe.Nothing(),
+                test: new _scope$3.hifive._Future(function (reject, resolve) {
+                    try {
+                        (function () {
+                            var IPerson = Enc['spec']({
+                                    name: PString,
+                                    age: PNumber
+                                });
+                            (function (alright) {
+                                return alright.verify(Enc.reifyAs(IPerson, {
+                                    name: 'Alice',
+                                    age: 12,
+                                    likes: 'sweets'
+                                }))(alright.equal({
+                                    name: 'Alice',
+                                    age: 12
+                                }));
+                            }(typeof module !== 'undefined' && typeof require !== 'undefined' ? require('alright') : window.alright));
+                        }());
+                        resolve();
+                    } catch (e) {
+                        reject(e);
+                    }
+                })
+            }));
+            _scope$3.tests.push(_scope$3.hifive.Test.Case.create({
+                name: 'Should fail if any of the keys fail',
+                timeout: new _scope$3.hifive._Maybe.Nothing(),
+                slow: new _scope$3.hifive._Maybe.Nothing(),
+                enabled: new _scope$3.hifive._Maybe.Nothing(),
+                test: new _scope$3.hifive._Future(function (reject, resolve) {
+                    try {
+                        (function () {
+                            var IPerson = Enc['spec']({
+                                    name: PString,
+                                    age: PNumber
+                                });
+                            (function (alright) {
+                                return alright.verify(function () {
+                                    return Enc.reifyAs(IPerson, {
+                                        name: 'Alice',
+                                        age: '12'
+                                    });
+                                })(_.raise(TypeError));
+                            }(typeof module !== 'undefined' && typeof require !== 'undefined' ? require('alright') : window.alright));
+                        }());
+                        resolve();
+                    } catch (e) {
+                        reject(e);
+                    }
+                })
+            }));
+            _scope$3.tests.push(_scope$3.hifive.Test.Case.create({
+                name: 'Should work with complex data structures',
+                timeout: new _scope$3.hifive._Maybe.Nothing(),
+                slow: new _scope$3.hifive._Maybe.Nothing(),
+                enabled: new _scope$3.hifive._Maybe.Nothing(),
+                test: new _scope$3.hifive._Future(function (reject, resolve) {
+                    try {
+                        (function () {
+                            var IPerson = Enc['spec']({
+                                    name: PString,
+                                    age: PNumber,
+                                    avatar: Maybe
+                                });
+                            var eq = function (b) {
+                                return this.name === b.name && this.age === b.age && this.avatar.isEqual(b.avatar);
+                            };
+                            var p1 = {
+                                    name: 'Alice',
+                                    age: 12,
+                                    avatar: Maybe.Just('/alice.png'),
+                                    isEqual: eq
+                                };
+                            var p2 = {
+                                    name: 'Rabbit',
+                                    age: 100,
+                                    avatar: Maybe.Nothing,
+                                    isEqual: eq
+                                };
+                            (function (alright) {
+                                return alright.verify(Enc.parseAs(IPerson, Enc.serialise(p1)))(alright.equal(p1));
+                            }(typeof module !== 'undefined' && typeof require !== 'undefined' ? require('alright') : window.alright));
+                            (function (alright) {
+                                return alright.verify(Enc.parseAs(IPerson, Enc.serialise(p2)))(alright.equal(p2));
+                            }(typeof module !== 'undefined' && typeof require !== 'undefined' ? require('alright') : window.alright));
+                        }());
+                        resolve();
+                    } catch (e) {
+                        reject(e);
+                    }
+                })
+            }));
+            _scope$2.tests.push(_scope$2.hifive.Test.Suite.create({
+                name: 'Specs',
                 tests: _scope$3.tests,
                 beforeAll: _scope$2.hifive.Hook(_scope$3.beforeAll),
                 beforeEach: _scope$2.hifive.Hook(_scope$3.beforeEach),

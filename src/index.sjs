@@ -26,6 +26,7 @@
  */
 
 var { Left, Right } = require('data.either');
+var { curry } = require('core.lambda');
 
 function raise(e) {
   throw e
@@ -33,6 +34,24 @@ function raise(e) {
 
 function id(a) {
   return a
+}
+
+function pairs(o) {
+  return Object.keys(o).map(λ(k) -> ({ key: k, value: o[k] }))
+}
+
+
+function toParser(a) {
+  if (Object(a) !== a) throw new TypeError('Values in a spec must be parsers or specs');
+
+  return a.fromJSON?      a
+  :      /* otherwise */  spec(a)
+}
+
+function applyValue(f) {
+  return function(pair) {
+    return { key: pair.key, value: f(pair.value) }
+  }
 }
 
 function foldType(mapping, data) {
@@ -44,6 +63,26 @@ function foldType(mapping, data) {
   :      /* _ */   Right(branch(data))
 }
 
+function spec(iface) {
+  var strategy = pairs(iface).map(applyValue(toParser));
+  var builder = curry(strategy.length, function() {
+    var result = {};
+    for (var i = 0; i < arguments.length; ++i) {
+      var pair = arguments[i];
+      result[pair[0]] = pair[1];
+    }
+    return result
+  })
+  
+  return {
+    fromJSON: function(data) {
+      return strategy.reduce(function(result, pair) {
+        return result.ap(pair.value.fromJSON(data[pair.key]).map(λ[([pair.key, #])]))
+      }, Right(builder));
+    }
+  }
+}
+
 function reifyAs(spec, data) {
   return spec.fromJSON(data).fold(raise, id)
 }
@@ -52,10 +91,19 @@ function parseAs(spec, text) {
   return reifyAs(spec, JSON.parse(text))
 }
 
+// Common interfaces
+var Any = {
+  fromJSON: function(data) {
+    return Right(data)
+  }
+};
+
 
 module.exports = {
   serialise: JSON.stringify,
   foldType: foldType,
   reifyAs: reifyAs,
-  parseAs: parseAs
+  spec: spec,
+  parseAs: parseAs,
+  Any: Any
 }
